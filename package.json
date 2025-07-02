@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "deploy": "pnpm wrangler deploy",
-    "dev": "pnpm wrangler dev",
+    "dev": "pnpm wrangler dev --env dev",
+    "dev:staging": "pnpm wrangler dev --env staging",
+    "dev:production": "pnpm wrangler dev --env production",
     "start": "pnpm wrangler dev",
     "test": "pnpm vitest",
     "cf-typegen": "pnpm wrangler types",

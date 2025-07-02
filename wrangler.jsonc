@@ -27,7 +27,26 @@
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    */
-  // "vars": { "MY_VARIABLE": "production_value" },
+  "vars": { "CUSTOM_DOMAIN": "docker.example.com" },
+  "env": {
+    "dev": {
+      "vars": {
+        "ENVIRONMENT": "dev",
+        "DEFAULT_CHINESE": true,
+        "CUSTOM_DOMAIN": "dev-docker.example.com",
+      },
+    },
+    "staging": {
+      "vars": {
+        "CUSTOM_DOMAIN": "staging-docker.example.com",
+      },
+    },
+    "production": {
+      "vars": {
+        "CUSTOM_DOMAIN": "production-docker.example.com",
+      },
+    },
+  },
   /**
    * Note: Use secrets to store sensitive data.
    * https://developers.cloudflare.com/workers/configuration/secrets/
