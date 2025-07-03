@@ -40,8 +40,8 @@ describe('Hello World worker', () => {
           }
         },
         "defaultRegistry": "docker.io",
-        "timestamp": "2025-07-03T06:06:10.823Z",
-        "version": "1.0.0"
+        "timestamp": "2025-07-03T06:34:42.885Z",
+        "version": "0.0.1"
       }"
     `)
   })
@@ -69,8 +69,8 @@ describe('Hello World worker', () => {
           }
         },
         "defaultRegistry": "docker.io",
-        "timestamp": "2025-07-03T06:06:10.832Z",
-        "version": "1.0.0"
+        "timestamp": "2025-07-03T06:34:42.892Z",
+        "version": "0.0.1"
       }"
     `)
   })

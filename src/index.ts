@@ -1,5 +1,6 @@
 import { RegistryConfig, RegistryRequest } from './types'
 import { handleStatusPage } from './status-page'
+import packageInfo from '../package.json'
 
 // ===== Constants =====
 const DEFAULT_REGISTRY = 'docker.io'
@@ -7,7 +8,7 @@ const DOCKER_V2_PREFIX = '/v2/'
 const DOCKER_AUTH_ENDPOINT = '/v2/auth'
 const LIBRARY_PREFIX = 'library'
 const SERVICE_NAME = 'cf-docker-proxy'
-const API_VERSION = '1.0.0'
+const API_VERSION = packageInfo.version
 
 // ===== Registry Configuration =====
 const REGISTRIES: Record<string, RegistryConfig> = {
@@ -22,6 +23,10 @@ const REGISTRIES: Record<string, RegistryConfig> = {
   'gcr.io': {
     url: 'https://gcr.io',
     testImage: 'google-containers/pause',
+  },
+  'k8s.io': {
+    url: 'https://registry.k8s.io',
+    testImage: 'distroless/static',
   },
   'quay.io': {
     url: 'https://quay.io',
