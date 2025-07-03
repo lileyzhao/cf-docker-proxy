@@ -33,6 +33,18 @@ jobs:
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
+        env:
+          DOCKER_IO_PROXY: ${{ secrets.DOCKER_IO_PROXY || '' }}
+          GHCR_IO_PROXY: ${{ secrets.GHCR_IO_PROXY || '' }}
+          GCR_IO_PROXY: ${{ secrets.GCR_IO_PROXY || '' }}
+          K8S_IO_PROXY: ${{ secrets.K8S_IO_PROXY || '' }}
+          QUAY_IO_PROXY: ${{ secrets.QUAY_IO_PROXY || '' }}
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           command: deploy
+          secrets: |
+            DOCKER_IO_PROXY
+            GHCR_IO_PROXY
+            GCR_IO_PROXY
+            K8S_IO_PROXY
+            QUAY_IO_PROXY
