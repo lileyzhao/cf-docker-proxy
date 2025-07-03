@@ -4,6 +4,14 @@
 
 基于 Cloudflare Workers 构建的 Docker 镜像仓库代理服务，为 Docker Hub、GitHub Container Registry、Google Container Registry、Kubernetes Registry 和 Quay.io 等多个镜像仓库提供加速访问。
 
+## ⚠️ 重要风险警告
+
+**请仔细阅读并理解以下风险警告：**
+
+Cloudflare 于 2024 年 12 月 3 日更新了其[服务条款](https://www.cloudflare.com/terms/)，明确规定不得将其服务用作代理。根据条款第 2.2.1 项的限制，将 Cloudflare 服务用作代理可能被视为违反服务条款，存在账户被封禁的风险。
+
+**本项目仅供学习和技术研究使用，请在了解相关风险后谨慎使用。如果您选择部署此项目，请在 24 小时内移除 Cloudflare 上的部署。**
+
 ## 项目特点
 
 **单域名支持多仓库**：与其他需要为每个仓库配置不同域名的代理不同，本项目只需一个域名即可支持所有主流镜像仓库。

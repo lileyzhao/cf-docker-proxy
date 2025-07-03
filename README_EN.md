@@ -4,6 +4,14 @@
 
 A Docker registry proxy service built on Cloudflare Workers that provides accelerated access to Docker images from multiple registries including Docker Hub, GitHub Container Registry, Google Container Registry, Kubernetes Registry, and Quay.io.
 
+## ⚠️ Important Risk Warning
+
+**Please carefully read and understand the following risk warning:**
+
+Cloudflare updated its [Terms of Service](https://www.cloudflare.com/terms/) on December 3, 2024, explicitly stating that using their services as a proxy is prohibited. According to the restrictions in section 2.2.1 of the terms, using Cloudflare services as a proxy may be considered a violation of the terms of service and could result in account suspension.
+
+**This project is intended for learning and technical research purposes only. Please use it cautiously after understanding the associated risks. If you choose to deploy this project, please remove the Cloudflare deployment within 24 hours.**
+
 ## Why This Project
 
 **Single domain for multiple registries**: Unlike other proxies that require different domains for each registry, this project supports all mainstream image registries with just one domain.
