@@ -8,4 +8,5 @@ export type RegistryRequest = {
   registry: string
   cleanPath: string
   isDockerHub: boolean
+  imageName: string
 }

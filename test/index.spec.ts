@@ -19,59 +19,77 @@ describe('Hello World worker', () => {
     const response = await worker.fetch(request, env, ctx)
     // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
     await waitOnExecutionContext(ctx)
-    expect(await response.text()).toMatchInlineSnapshot(`
-      "{
+    const responseText = await response.text()
+    const responseData = JSON.parse(responseText)
+
+    // Remove timestamp for comparison
+    delete responseData.timestamp
+
+    expect(responseData).toMatchInlineSnapshot(`
+      {
+        "defaultRegistry": "docker.io",
         "registries": {
           "docker.io": {
+            "testImage": "hello-world",
             "url": "https://registry-1.docker.io",
-            "testImage": "hello-world"
-          },
-          "ghcr.io": {
-            "url": "https://ghcr.io",
-            "testImage": "distroless/static"
           },
           "gcr.io": {
+            "testImage": "google-containers/pause",
             "url": "https://gcr.io",
-            "testImage": "google-containers/pause"
+          },
+          "ghcr.io": {
+            "testImage": "distroless/static",
+            "url": "https://ghcr.io",
+          },
+          "k8s.io": {
+            "testImage": "distroless/static",
+            "url": "https://registry.k8s.io",
           },
           "quay.io": {
+            "testImage": "prometheus/node-exporter",
             "url": "https://quay.io",
-            "testImage": "prometheus/node-exporter"
-          }
+          },
         },
-        "defaultRegistry": "docker.io",
-        "timestamp": "2025-07-03T06:34:42.885Z",
-        "version": "0.0.1"
-      }"
+        "version": "0.0.1",
+      }
     `)
   })
 
   it('responds with Hello World! (integration style)', async () => {
     const response = await SELF.fetch('https://example.com')
-    expect(await response.text()).toMatchInlineSnapshot(`
-      "{
+    const responseText = await response.text()
+    const responseData = JSON.parse(responseText)
+
+    // Remove timestamp for comparison
+    delete responseData.timestamp
+
+    expect(responseData).toMatchInlineSnapshot(`
+      {
+        "defaultRegistry": "docker.io",
         "registries": {
           "docker.io": {
+            "testImage": "hello-world",
             "url": "https://registry-1.docker.io",
-            "testImage": "hello-world"
-          },
-          "ghcr.io": {
-            "url": "https://ghcr.io",
-            "testImage": "distroless/static"
           },
           "gcr.io": {
+            "testImage": "google-containers/pause",
             "url": "https://gcr.io",
-            "testImage": "google-containers/pause"
+          },
+          "ghcr.io": {
+            "testImage": "distroless/static",
+            "url": "https://ghcr.io",
+          },
+          "k8s.io": {
+            "testImage": "distroless/static",
+            "url": "https://registry.k8s.io",
           },
           "quay.io": {
+            "testImage": "prometheus/node-exporter",
             "url": "https://quay.io",
-            "testImage": "prometheus/node-exporter"
-          }
+          },
         },
-        "defaultRegistry": "docker.io",
-        "timestamp": "2025-07-03T06:34:42.892Z",
-        "version": "0.0.1"
-      }"
+        "version": "0.0.1",
+      }
     `)
   })
 })

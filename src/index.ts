@@ -47,6 +47,128 @@ const BROWSER_PATTERNS = [
 // ===== Registry Parsing Utilities =====
 
 /**
+ * Normalizes URL by adding https:// prefix if missing
+ * @param url - URL string that may be missing protocol
+ * @returns Normalized URL with https:// prefix
+ */
+function normalizeUrl(url: string): string {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+  return url
+}
+
+/**
+ * Parses DOCKER_IO_PROXY environment variable into array of URLs
+ * @param envValue - Environment variable value (string, string array, or undefined)
+ * @returns Array of normalized URLs
+ */
+function parseDockerIoProxy(envValue: string[] | string | undefined): string[] {
+  if (!envValue) {
+    return []
+  }
+
+  // If already an array, normalize each URL
+  if (Array.isArray(envValue)) {
+    return envValue.map(normalizeUrl)
+  }
+
+  // If string, try multiple parsing strategies
+  try {
+    // First try to parse as JSON array
+    const parsed = JSON.parse(envValue)
+    if (Array.isArray(parsed)) {
+      return parsed.map(normalizeUrl)
+    }
+    // If JSON parsed but not array, treat as single string
+    return [normalizeUrl(parsed)]
+  } catch {
+    // If JSON parsing fails, check for comma-separated values
+    if (envValue.includes(',')) {
+      return envValue
+        .split(',')
+        .map((url) => url.trim())
+        .filter((url) => url.length > 0)
+        .map(normalizeUrl)
+    }
+
+    // Otherwise treat as single URL string
+    return [normalizeUrl(envValue)]
+  }
+}
+
+/**
+ * Simple hash function to generate consistent index
+ * @param str - String to hash
+ * @returns Hash value
+ */
+function simpleHash(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return Math.abs(hash)
+}
+
+/**
+ * Gets all available URLs for docker.io registry
+ * @param env - Environment variables
+ * @returns Array of URLs including official and proxy URLs
+ */
+function getDockerIoUrls(env: Env): string[] {
+  const officialUrl = REGISTRIES['docker.io'].url
+  const proxyUrls = parseDockerIoProxy(env.DOCKER_IO_PROXY)
+  return [officialUrl, ...proxyUrls]
+}
+
+/**
+ * Selects a registry URL from the configuration with consistency
+ * @param config - Registry configuration
+ * @param imageName - Optional image name for consistent selection
+ * @param registry - Registry name for special handling
+ * @param env - Environment variables for dynamic configuration
+ * @returns A single URL string
+ * @description Uses hash-based selection for same image names, defaults to first URL otherwise
+ */
+function selectRegistryUrl(
+  config: RegistryConfig,
+  imageName?: string,
+  registry?: string,
+  env?: Env
+): string {
+  let urls: string[]
+
+  // Special handling for docker.io with environment variable support
+  if (registry === 'docker.io' && env) {
+    urls = getDockerIoUrls(env)
+  } else {
+    urls = [config.url]
+  }
+
+  if (urls.length > 0) {
+    let selectedUrl: string
+
+    if (imageName && urls.length > 1) {
+      // Use consistent hash-based selection for same image
+      const hash = simpleHash(imageName)
+      const index = hash % urls.length
+      selectedUrl = urls[index]
+    } else {
+      // Default to first URL if no image name provided or only one URL
+      selectedUrl = urls[0]
+    }
+
+    console.log(`🎯 Selected URL for ${registry || 'registry'}: ${selectedUrl}`)
+
+    return selectedUrl
+  }
+
+  throw new Error('Registry configuration must have at least one URL')
+}
+
+/**
  * Parses registry information from a repository string
  * @param repository - Repository string (e.g., 'ghcr.io/owner/repo' or 'nginx')
  * @returns Parsed registry request information
@@ -56,10 +178,14 @@ function parseRegistryFromRepo(repository: string): RegistryRequest {
   const { registry, pathParts } = extractRegistryAndPath(parts, 0)
   const normalizedParts = addLibraryPrefixIfNeeded(pathParts)
 
+  // Extract image name (without version/tag)
+  const imageName = normalizedParts.join('/')
+
   return {
     registry,
     cleanPath: '/' + normalizedParts.join('/'),
     isDockerHub: registry === DEFAULT_REGISTRY,
+    imageName,
   }
 }
 
@@ -73,10 +199,15 @@ function parseRegistryFromPath(pathname: string): RegistryRequest {
   const { registry, pathParts } = extractRegistryAndPath(parts, 2)
   const normalizedParts = addLibraryPrefixIfNeeded(pathParts, 2)
 
+  // Extract image name from path
+  // Path format: /v2/{imageName}/manifests/{tag} or /v2/{imageName}/blobs/{digest}
+  let imageName = normalizedParts.slice(0, 2).join('/')
+
   return {
     registry,
     cleanPath: DOCKER_V2_PREFIX + normalizedParts.join('/'),
     isDockerHub: registry === DEFAULT_REGISTRY,
+    imageName,
   }
 }
 
@@ -179,7 +310,8 @@ export default {
         request,
         url,
         repositoryInfo,
-        scopeParts.join(':')
+        scopeParts.join(':'),
+        env
       )
     }
 
@@ -210,12 +342,19 @@ async function handleAuthEndpoint(
   request: Request,
   url: URL,
   registryRequest: RegistryRequest,
-  scope: string
+  scope: string,
+  env: Env
 ): Promise<Response> {
   const registryConfig = REGISTRIES[registryRequest.registry]
 
   // First send request to specified registry to get authentication info
-  const dockerResponse = await fetch(`${registryConfig.url}/v2/`, {
+  const registryUrl = selectRegistryUrl(
+    registryConfig,
+    registryRequest.imageName,
+    registryRequest.registry,
+    env
+  )
+  const dockerResponse = await fetch(`${registryUrl}/v2/`, {
     method: 'GET',
     redirect: 'follow',
   })
@@ -275,10 +414,13 @@ async function handleDockerRequest(
   }
 
   // Build target URL and forward request
-  const targetUrl = new URL(
-    pathParts.join('/') + url.search,
-    registryConfig.url
+  const registryUrl = selectRegistryUrl(
+    registryConfig,
+    registryRequest.imageName,
+    registryRequest.registry,
+    env
   )
+  const targetUrl = new URL(pathParts.join('/') + url.search, registryUrl)
   console.log(`🔗 Forwarding request to: ${targetUrl.toString()}`)
   const proxyRequest = new Request(targetUrl.toString(), {
     method: request.method,
