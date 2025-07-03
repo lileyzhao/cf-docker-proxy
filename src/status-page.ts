@@ -3,10 +3,19 @@ import { RegistryConfig } from './types'
 /**
  * 注册表描述配置
  */
-const REGISTRY_DESCRIPTIONS: Record<string, { description: string; descriptionZh: string }> = {
+const REGISTRY_DESCRIPTIONS: Record<
+  string,
+  { description: string; descriptionZh: string }
+> = {
   'docker.io': { description: 'Docker Hub', descriptionZh: 'Docker Hub' },
-  'ghcr.io': { description: 'GitHub Registry', descriptionZh: 'GitHub 容器注册表' },
-  'gcr.io': { description: 'Google Registry', descriptionZh: 'Google 容器注册表' },
+  'ghcr.io': {
+    description: 'GitHub Registry',
+    descriptionZh: 'GitHub 容器注册表',
+  },
+  'gcr.io': {
+    description: 'Google Registry',
+    descriptionZh: 'Google 容器注册表',
+  },
   'quay.io': { description: 'Quay.io', descriptionZh: 'Quay.io' },
 }
 
@@ -43,7 +52,10 @@ export function handleStatusPage(
   const examples = Object.entries(registries)
     .map(([key, config]) => {
       const isDefault = key === defaultRegistry
-      const registryDesc = REGISTRY_DESCRIPTIONS[key] || { description: key, descriptionZh: key }
+      const registryDesc = REGISTRY_DESCRIPTIONS[key] || {
+        description: key,
+        descriptionZh: key,
+      }
 
       if (isDefault) {
         return [
@@ -56,26 +68,30 @@ export function handleStatusPage(
             command: `docker pull ${url.host}/${key}/${config.testImage}`,
             description: `${registryDesc.description} (Full Path)`,
             descriptionZh: `${registryDesc.descriptionZh} (完整路径)`,
-          }
+          },
         ]
       }
-      return [{
-        command: `docker pull ${url.host}/${key}/${config.testImage}`,
-        description: registryDesc.description,
-        descriptionZh: registryDesc.descriptionZh,
-      }]
+      return [
+        {
+          command: `docker pull ${url.host}/${key}/${config.testImage}`,
+          description: registryDesc.description,
+          descriptionZh: registryDesc.descriptionZh,
+        },
+      ]
     })
     .flat()
 
   const exampleRows = examples
-    .map(({ command, description, descriptionZh }) => `
+    .map(
+      ({ command, description, descriptionZh }) => `
       <div class="example-item">
         <code class="example-cmd">${command}</code>
         <span class="example-desc" data-en="# ${description}" data-zh="# ${descriptionZh}"># ${
           isDefaultChinese ? descriptionZh : description
         }</span>
       </div>
-    `)
+    `
+    )
     .join('')
 
   const html = `

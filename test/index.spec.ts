@@ -19,11 +19,59 @@ describe('Hello World worker', () => {
     const response = await worker.fetch(request, env, ctx)
     // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
     await waitOnExecutionContext(ctx)
-    expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`)
+    expect(await response.text()).toMatchInlineSnapshot(`
+      "{
+        "registries": {
+          "docker.io": {
+            "url": "https://registry-1.docker.io",
+            "testImage": "hello-world"
+          },
+          "ghcr.io": {
+            "url": "https://ghcr.io",
+            "testImage": "distroless/static"
+          },
+          "gcr.io": {
+            "url": "https://gcr.io",
+            "testImage": "google-containers/pause"
+          },
+          "quay.io": {
+            "url": "https://quay.io",
+            "testImage": "prometheus/node-exporter"
+          }
+        },
+        "defaultRegistry": "docker.io",
+        "timestamp": "2025-07-03T06:06:10.823Z",
+        "version": "1.0.0"
+      }"
+    `)
   })
 
   it('responds with Hello World! (integration style)', async () => {
     const response = await SELF.fetch('https://example.com')
-    expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`)
+    expect(await response.text()).toMatchInlineSnapshot(`
+      "{
+        "registries": {
+          "docker.io": {
+            "url": "https://registry-1.docker.io",
+            "testImage": "hello-world"
+          },
+          "ghcr.io": {
+            "url": "https://ghcr.io",
+            "testImage": "distroless/static"
+          },
+          "gcr.io": {
+            "url": "https://gcr.io",
+            "testImage": "google-containers/pause"
+          },
+          "quay.io": {
+            "url": "https://quay.io",
+            "testImage": "prometheus/node-exporter"
+          }
+        },
+        "defaultRegistry": "docker.io",
+        "timestamp": "2025-07-03T06:06:10.832Z",
+        "version": "1.0.0"
+      }"
+    `)
   })
 })
