@@ -369,8 +369,6 @@ async function handleAuthEndpoint(
     redirect: 'follow',
   })
 
-  console.log(`🔍 Auth request response status: ${dockerResponse.status}`)
-
   // If no authentication required, return directly
   if (dockerResponse.status !== 401) {
     return dockerResponse
