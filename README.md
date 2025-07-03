@@ -2,18 +2,17 @@
 
 中文 | [English](README_EN.md)
 
-![deploy](https://github.com/lileyzhao/cf-docker-proxy/actions/workflows/deploy.yaml/badge.svg)
-
 基于 Cloudflare Workers 构建的 Docker 镜像仓库代理服务，为 Docker Hub、GitHub Container Registry、Google Container Registry、Kubernetes Registry 和 Quay.io 等多个镜像仓库提供加速访问。
+
+## 项目特点
+
+**单域名支持多仓库**：与其他需要为每个仓库配置不同域名的代理不同，本项目只需一个域名即可支持所有主流镜像仓库。
 
 ## 特性
 
-- 🚀 通过 Cloudflare 全球边缘网络加速镜像拉取
+- 🔗 单域名支持所有仓库
 - 🌐 支持多个镜像仓库（Docker Hub、ghcr.io、gcr.io、k8s.io、quay.io）
-- 🔐 自动处理身份验证
-- 📊 内置状态页面和健康监控
-- 🆓 支持 Cloudflare Workers 免费套餐
-- ⚡ 零维护成本
+- 🚀 通过 Cloudflare 全球边缘网络加速镜像拉取
 
 ## 部署
 

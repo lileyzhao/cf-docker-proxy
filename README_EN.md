@@ -2,18 +2,17 @@
 
 [中文](README.md) | English
 
-![deploy](https://github.com/lileyzhao/cf-docker-proxy/actions/workflows/deploy.yaml/badge.svg)
-
 A Docker registry proxy service built on Cloudflare Workers that provides accelerated access to Docker images from multiple registries including Docker Hub, GitHub Container Registry, Google Container Registry, Kubernetes Registry, and Quay.io.
+
+## Why This Project
+
+**Single domain for multiple registries**: Unlike other proxies that require different domains for each registry, this project supports all mainstream image registries with just one domain.
 
 ## Features
 
-- 🚀 Fast image pulling through Cloudflare's global edge network
+- 🔗 Single domain supports all registries
 - 🌐 Support for multiple registries (Docker Hub, ghcr.io, gcr.io, k8s.io, quay.io)
-- 🔐 Automatic authentication handling
-- 📊 Built-in status page and health monitoring
-- 🆓 Free tier available with Cloudflare Workers
-- ⚡ Zero maintenance required
+- 🚀 Fast image pulling through Cloudflare's global edge network
 
 ## Deploy
 
