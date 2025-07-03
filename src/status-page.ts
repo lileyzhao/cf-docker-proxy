@@ -28,17 +28,14 @@ export function handleStatusPage(
   registries: Record<string, RegistryConfig>,
   defaultRegistry: string
 ): Response {
-  // 获取是否默认中文设置，默认为 false (英文)
-  const isDefaultChinese = env.DEFAULT_CHINESE === true
-  const defaultLang = isDefaultChinese ? 'zh' : 'en'
+  // 默认显示中文
+  const defaultLang = 'zh'
 
   const registryRows = Object.entries(registries)
     .map(([key, config]) => {
       const isDefault = key === defaultRegistry
       const defaultBadge = isDefault
-        ? `<span class="default-badge" data-en="Default" data-zh="默认">${
-            isDefaultChinese ? '默认' : 'Default'
-          }</span>`
+        ? `<span class="default-badge" data-en="Default" data-zh="默认">默认</span>`
         : ''
       return `
         <tr>
@@ -86,9 +83,7 @@ export function handleStatusPage(
       ({ command, description, descriptionZh }) => `
       <div class="example-item">
         <code class="example-cmd">${command}</code>
-        <span class="example-desc" data-en="# ${description}" data-zh="# ${descriptionZh}"># ${
-          isDefaultChinese ? descriptionZh : description
-        }</span>
+        <span class="example-desc" data-en="# ${description}" data-zh="# ${descriptionZh}"># ${descriptionZh}</span>
       </div>
     `
     )
@@ -100,9 +95,7 @@ export function handleStatusPage(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${
-      isDefaultChinese ? 'Docker 镜像仓库代理' : 'Docker Registry Proxy'
-    }</title>
+    <title>Docker 镜像仓库代理</title>
     <style>
         * {
             margin: 0;
@@ -715,44 +708,26 @@ export function handleStatusPage(
     <div class="container">
         <div class="card loading">
             <div class="header">
-                <h1 class="title" data-en="🐳 Docker Registry Proxy" data-zh="🐳 Docker 镜像仓库代理">${
-                  isDefaultChinese
-                    ? '🐳 Docker 镜像仓库代理'
-                    : '🐳 Docker Registry Proxy'
-                }</h1>
+                <h1 class="title" data-en="🐳 Docker Registry Proxy" data-zh="🐳 Docker 镜像仓库代理">🐳 Docker 镜像仓库代理</h1>
                 <div class="lang-switch">
-                    <button class="lang-btn ${
-                      !isDefaultChinese ? 'active' : ''
-                    }" onclick="switchLang('en', this)">English</button>
-                    <button class="lang-btn ${
-                      isDefaultChinese ? 'active' : ''
-                    }" onclick="switchLang('zh', this)">简体中文</button>
+                    <button class="lang-btn active" onclick="switchLang('zh', this)">简体中文</button>
+                    <button class="lang-btn" onclick="switchLang('en', this)">English</button>
                 </div>
                 <div class="status">
-                    <span data-en="🚀 Proxy is running normally" data-zh="🚀 代理正常运行">${
-                      isDefaultChinese
-                        ? '🚀 代理正常运行'
-                        : '🚀 Proxy is running normally'
-                    }</span>
+                    <span data-en="🚀 Proxy is running normally" data-zh="🚀 代理正常运行">🚀 代理正常运行</span>
                 </div>
             </div>
 
             <div class="section" style="animation-delay: 0.1s;">
                 <h2 class="section-title">
                     <span class="icon">📋</span>
-                    <span data-en="Supported Registries" data-zh="支持的注册表">${
-                      isDefaultChinese ? '支持的注册表' : 'Supported Registries'
-                    }</span>
+                    <span data-en="Supported Registries" data-zh="支持的注册表">支持的注册表</span>
                 </h2>
                 <table class="registry-table">
                     <thead>
                         <tr>
-                            <th data-en="Registry" data-zh="注册表">${
-                              isDefaultChinese ? '注册表' : 'Registry'
-                            }</th>
-                            <th data-en="Target URL" data-zh="目标地址">${
-                              isDefaultChinese ? '目标地址' : 'Target URL'
-                            }</th>
+                            <th data-en="Registry" data-zh="注册表">注册表</th>
+                            <th data-en="Target URL" data-zh="目标地址">目标地址</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -764,9 +739,7 @@ export function handleStatusPage(
             <div class="section" style="animation-delay: 0.2s;">
                 <h2 class="section-title">
                     <span class="icon">💡</span>
-                    <span data-en="Usage Examples" data-zh="使用示例">${
-                      isDefaultChinese ? '使用示例' : 'Usage Examples'
-                    }</span>
+                    <span data-en="Usage Examples" data-zh="使用示例">使用示例</span>
                 </h2>
                 <div class="examples">
                     ${exampleRows}
@@ -775,11 +748,7 @@ export function handleStatusPage(
 
             <div class="section" style="animation-delay: 0.3s;">
                 <p style="color: var(--text-secondary); text-align: center; font-size: 0.95rem;">
-                    <span data-en="📖 Compatible with Docker Registry HTTP API V2" data-zh="📖 兼容 Docker Registry HTTP API V2">${
-                      isDefaultChinese
-                        ? '📖 兼容 Docker Registry HTTP API V2'
-                        : '📖 Compatible with Docker Registry HTTP API V2'
-                    }</span>
+                    <span data-en="📖 Compatible with Docker Registry HTTP API V2" data-zh="📖 兼容 Docker Registry HTTP API V2">📖 兼容 Docker Registry HTTP API V2</span>
                 </p>
             </div>
         </div>
@@ -787,9 +756,7 @@ export function handleStatusPage(
 
     <div class="footer">
         <p>
-            <span class="footer-text" data-en="🌟 Powered by" data-zh="🌟 项目地址">${
-              isDefaultChinese ? '🌟 项目地址' : '🌟 Powered by'
-            }</span>
+            <span class="footer-text" data-en="🌟 Powered by" data-zh="🌟 项目地址">🌟 项目地址</span>
             <a href="https://github.com/lileyzhao/cf-docker-proxy" target="_blank">https://github.com/lileyzhao/cf-docker-proxy</a>
         </p>
     </div>
