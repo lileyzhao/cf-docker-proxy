@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "deploy": "pnpm wrangler deploy",
-    "dev": "pnpm wrangler dev --env dev",
-    "dev:staging": "pnpm wrangler dev --env staging",
-    "dev:production": "pnpm wrangler dev --env production",
-    "start": "pnpm wrangler dev",
-    "test": "pnpm vitest",
-    "cf-typegen": "pnpm wrangler types",
-    "format": "pnpm dlx prettier --write ."
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --env dev",
+    "dev:staging": "wrangler dev --env staging",
+    "dev:production": "wrangler dev --env production",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types",
+    "format": "npx prettier --write ."
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.48",
