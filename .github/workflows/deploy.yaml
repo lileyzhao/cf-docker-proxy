@@ -42,7 +42,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           command: deploy
-          secrets: |
+          vars: |
             DOCKER_IO_PROXY
             GHCR_IO_PROXY
             GCR_IO_PROXY
