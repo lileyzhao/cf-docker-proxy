@@ -33,6 +33,16 @@
         "ENVIRONMENT": "dev",
       },
     },
+    "staging": {
+      "vars": {
+        "ENVIRONMENT": "staging",
+      },
+    },
+    "production": {
+      "vars": {
+        "ENVIRONMENT": "production",
+      },
+    },
   },
   /**
    * Note: Use secrets to store sensitive data.
