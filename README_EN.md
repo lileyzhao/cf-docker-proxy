@@ -18,9 +18,11 @@ Cloudflare updated its [Terms of Service](https://www.cloudflare.com/terms/) on 
 
 ## Features
 
-- 🔗 Single domain supports all registries
-- 🌐 Support for multiple registries (Docker Hub, ghcr.io, gcr.io, k8s.io, quay.io)
-- 🚀 Fast image pulling through Cloudflare's global edge network
+- 🔗 Single Domain Support: One domain supports all mainstream image registries
+- 🌐 Multi-Registry Support: Support for Docker Hub, ghcr.io, gcr.io, k8s.io, quay.io and more
+- ⚡ Smart Load Balancing: Support multiple Docker Hub mirror sources with consistent source selection per image
+- 🔧 Flexible Configuration: Dynamic mirror source configuration via environment variables with multiple format support
+- 🚀 Global Acceleration: Fast image pulling through Cloudflare's global edge network
 
 ## Deploy
 
@@ -81,6 +83,78 @@ docker pull your-worker-domain.workers.dev/quay.io/prometheus/node-exporter
 ```
 
 Replace `your-worker-domain.workers.dev` with your actual Cloudflare Workers domain.
+
+## 🔧 Advanced Configuration
+
+### Multi-Mirror Load Balancing
+
+This project supports configuring multiple mirror sources for all registries to achieve intelligent load balancing. You can add additional mirror sources for each registry through environment variables.
+
+#### Configuration
+
+Configure the corresponding environment variables in `wrangler.jsonc`:
+
+```json
+{
+  "vars": {
+    "DOCKER_IO_PROXY": "docker.1ms.run,docker.xuanyuan.me,docker-0.unsee.tech",
+    "GHCR_IO_PROXY": "ghcr.mirror1.com,ghcr.mirror2.com",
+    "GCR_IO_PROXY": "gcr.mirror1.com",
+    "K8S_IO_PROXY": "k8s.mirror1.com,k8s.mirror2.com",
+    "QUAY_IO_PROXY": "quay.mirror1.com"
+  }
+}
+```
+
+#### Supported Environment Variables
+
+| Registry                  | Environment Variable | Description                     |
+| ------------------------- | -------------------- | ------------------------------- |
+| Docker Hub                | `DOCKER_IO_PROXY`    | Docker Hub mirror sources       |
+| GitHub Container Registry | `GHCR_IO_PROXY`      | GitHub container mirror sources |
+| Google Container Registry | `GCR_IO_PROXY`       | Google container mirror sources |
+| Kubernetes Registry       | `K8S_IO_PROXY`       | Kubernetes mirror sources       |
+| Quay.io                   | `QUAY_IO_PROXY`      | Red Hat Quay mirror sources     |
+
+#### Supported Configuration Formats
+
+1. **Multiple mirror sources (comma-separated)**:
+
+   ```json
+   {
+     "vars": {
+       "DOCKER_IO_PROXY": "docker.1ms.run,docker.xuanyuan.me,docker-0.unsee.tech"
+     }
+   }
+   ```
+
+2. **Single mirror source**:
+
+   ```json
+   {
+     "vars": {
+       "DOCKER_IO_PROXY": "docker.1ms.run"
+     }
+   }
+   ```
+
+#### Smart Features
+
+- **Consistency Guarantee**: All requests (auth, manifest, blob layers) for the same Docker image use the same mirror source
+- **Auto Protocol**: URLs don't need `https://` prefix, the system adds it automatically
+- **Mixed Protocols**: Support mixing HTTP and HTTPS, e.g., `https://mirror1.com,http://internal-mirror,mirror2.com`
+- **Load Distribution**: Different images are distributed across different mirror sources for load balancing
+- **Failover Ready**: Quick switching to other sources if a mirror becomes unavailable
+
+#### How It Works
+
+The system uses a consistent hashing algorithm to determine a fixed mirror source based on the image name. For example:
+
+- All requests for `nginx` image → `docker.1ms.run`
+- All requests for `redis` image → `docker.xuanyuan.me`
+- All requests for `mysql` image → `docker-0.unsee.tech`
+
+This ensures that all related requests during Docker image pulling use the same mirror source, avoiding issues caused by cross-source requests.
 
 ## License
 

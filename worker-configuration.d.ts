@@ -4,7 +4,11 @@
 declare namespace Cloudflare {
 	interface Env {
 		ENVIRONMENT: "dev" | "staging" | "production" | undefined;
-		DOCKER_IO_PROXY: string[] | string | undefined;
+		DOCKER_IO_PROXY: string | undefined;
+		GHCR_IO_PROXY: string | undefined;
+		GCR_IO_PROXY: string | undefined;
+		K8S_IO_PROXY: string | undefined;
+		QUAY_IO_PROXY: string | undefined;
 	}
 }
 interface Env extends Cloudflare.Env {}

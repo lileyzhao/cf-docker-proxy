@@ -59,42 +59,28 @@ function normalizeUrl(url: string): string {
 }
 
 /**
- * Parses DOCKER_IO_PROXY environment variable into array of URLs
- * @param envValue - Environment variable value (string, string array, or undefined)
+ * Parses registry proxy environment variable into array of URLs
+ * @param envValue - Environment variable value (string or undefined)
  * @returns Array of normalized URLs
+ * @description Supports single URL or comma-separated URLs
  */
-function parseDockerIoProxy(envValue: string[] | string | undefined): string[] {
+function parseRegistryProxy(envValue: string | undefined): string[] {
   if (!envValue) {
     return []
   }
 
-  // If already an array, normalize each URL
-  if (Array.isArray(envValue)) {
-    return envValue.map(normalizeUrl)
+  // Check for comma-separated values
+  if (envValue.includes(',')) {
+    return envValue
+      .split(',')
+      .map((url) => url.trim())
+      .filter((url) => url.length > 0)
+      .map(normalizeUrl)
   }
 
-  // If string, try multiple parsing strategies
-  try {
-    // First try to parse as JSON array
-    const parsed = JSON.parse(envValue)
-    if (Array.isArray(parsed)) {
-      return parsed.map(normalizeUrl)
-    }
-    // If JSON parsed but not array, treat as single string
-    return [normalizeUrl(parsed)]
-  } catch {
-    // If JSON parsing fails, check for comma-separated values
-    if (envValue.includes(',')) {
-      return envValue
-        .split(',')
-        .map((url) => url.trim())
-        .filter((url) => url.length > 0)
-        .map(normalizeUrl)
-    }
-
-    // Otherwise treat as single URL string
-    return [normalizeUrl(envValue)]
-  }
+  // Single URL
+  const trimmedUrl = envValue.trim()
+  return trimmedUrl.length > 0 ? [normalizeUrl(trimmedUrl)] : []
 }
 
 /**
@@ -113,13 +99,37 @@ function simpleHash(str: string): number {
 }
 
 /**
- * Gets all available URLs for docker.io registry
+ * Gets all available URLs for a registry
+ * @param registry - Registry name
  * @param env - Environment variables
  * @returns Array of URLs including official and proxy URLs
  */
-function getDockerIoUrls(env: Env): string[] {
-  const officialUrl = REGISTRIES['docker.io'].url
-  const proxyUrls = parseDockerIoProxy(env.DOCKER_IO_PROXY)
+function getRegistryUrls(registry: string, env: Env): string[] {
+  const officialUrl = REGISTRIES[registry].url
+  let proxyUrls: string[] = []
+
+  // Get proxy URLs based on registry
+  switch (registry) {
+    case 'docker.io':
+      proxyUrls = parseRegistryProxy(env.DOCKER_IO_PROXY)
+      break
+    case 'ghcr.io':
+      proxyUrls = parseRegistryProxy(env.GHCR_IO_PROXY)
+      break
+    case 'gcr.io':
+      proxyUrls = parseRegistryProxy(env.GCR_IO_PROXY)
+      break
+    case 'k8s.io':
+      proxyUrls = parseRegistryProxy(env.K8S_IO_PROXY)
+      break
+    case 'quay.io':
+      proxyUrls = parseRegistryProxy(env.QUAY_IO_PROXY)
+      break
+    default:
+      // For other registries, no proxy support yet
+      break
+  }
+
   return [officialUrl, ...proxyUrls]
 }
 
@@ -140,9 +150,9 @@ function selectRegistryUrl(
 ): string {
   let urls: string[]
 
-  // Special handling for docker.io with environment variable support
-  if (registry === 'docker.io' && env) {
-    urls = getDockerIoUrls(env)
+  // Get URLs with environment variable support for all registries
+  if (registry && env) {
+    urls = getRegistryUrls(registry, env)
   } else {
     urls = [config.url]
   }
